@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Kata Studio — Multi-Style Photo Transformer</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif; background: #020617; color: #f1f5f9; min-height: 100vh; padding: 1rem 1rem 12rem; font-size: 14px; line-height: 1.5; }
+.wrap { max-width: 1100px; margin: 0 auto; }
+header { text-align: center; padding: 1.5rem 0; border-bottom: 1px solid #1e293b; margin-bottom: 1.5rem; }
+.serif { font-family: Georgia, 'Times New Roman', serif; }
+h1 { font-family: Georgia, serif; font-size: 2.2rem; font-weight: 300; margin-bottom: 0.4rem; background: linear-gradient(135deg, #e87b35, #e5c15a 30%, #a8d8c8 50%, #c8b0e0 75%, #8b5fc4); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.05; }
+.sub { font-family: Georgia, serif; font-style: italic; font-size: 0.85rem; color: #64748b; }
+.kata { font-size: 0.7rem; letter-spacing: 0.4em; color: #fbbf24; opacity: 0.75; text-transform: uppercase; margin-bottom: 0.5rem; }
+.banner { background: linear-gradient(135deg, rgba(139,95,196,0.06), rgba(16,185,129,0.05)); border: 1px solid #1e293b; border-left: 2px solid #a78bfa; border-radius: 4px; padding: 1rem 1.15rem; font-size: 0.78rem; color: #94a3b8; margin-bottom: 1.2rem; line-height: 1.6; }
+.banner strong { color: #f1f5f9; font-weight: 600; }
+.banner .hl-v { color: #c4b5fd; } .banner .hl-e { color: #6ee7b7; } .banner .hl-a { color: #fcd34d; }
+.card { background: #0f172a; border: 1px solid #1e293b; border-radius: 4px; margin-bottom: 1rem; overflow: hidden; }
+.card-head { padding: 0.85rem 1rem; border-bottom: 1px solid #1e293b; display: flex; justify-content: space-between; align-items: center; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.15em; color: #e2e8f0; font-weight: 600; }
+.card-head .badge { font-size: 0.6rem; padding: 0.15rem 0.5rem; border: 1px solid #b45309; color: #fbbf24; border-radius: 2px; letter-spacing: 0.1em; }
+.card-body { padding: 1rem; }
+textarea, input[type=text], input[type=password], select { width: 100%; background: #020617; border: 1px solid #1e293b; border-radius: 4px; padding: 0.7rem 0.85rem; font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 0.78rem; color: #f1f5f9; outline: none; }
+textarea:focus, input:focus, select:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
+textarea { min-height: 90px; resize: vertical; line-height: 1.55; }
+select { cursor: pointer; -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%23fbbf24' d='M0 0l5 6 5-6z'/></svg>"); background-repeat: no-repeat; background-position: right 0.9rem center; background-size: 10px; padding-right: 2rem; }
+.btn { width: 100%; padding: 0.85rem; border-radius: 4px; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; border: 1px solid; transition: all 0.15s; }
+.btn-amber { background: linear-gradient(135deg, rgba(232,123,53,0.15), rgba(229,193,90,0.1)); border-color: #b45309; color: #fcd34d; }
+.btn-amber:hover:not(:disabled) { background: rgba(245,158,11,0.2); }
+.btn-amber:disabled { opacity: 0.3; cursor: not-allowed; }
+.btn-red { background: transparent; border-color: #b91c1c; color: #f87171; }
+.btn-slate { background: transparent; border-color: #334155; color: #94a3b8; font-size: 0.68rem; padding: 0.55rem 0.7rem; }
+.btn-slate:hover { color: #fcd34d; border-color: #b45309; }
+.btn-sm { font-size: 0.6rem; padding: 0.35rem 0.6rem; letter-spacing: 0.08em; width: auto; }
+.row { display: flex; gap: 0.5rem; margin-top: 0.6rem; flex-wrap: wrap; }
+.row > * { flex: 1; min-width: 100px; }
+.row > .no-flex { flex: 0 0 auto; min-width: auto; }
+.status-line { display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 0.85rem; background: #020617; border: 1px solid #1e293b; border-radius: 4px; font-size: 0.75rem; color: #64748b; margin-top: 0.7rem; }
+.status-line.ok { background: rgba(16,185,129,0.08); border-color: #065f46; color: #34d399; }
+.status-line.err { background: rgba(239,68,68,0.08); border-color: #7f1d1d; color: #f87171; }
+.status-line .dot { width: 6px; height: 6px; border-radius: 50%; background: #475569; flex-shrink: 0; }
+.status-line.ok .dot { background: #10b981; box-shadow: 0 0 6px #10b981; }
+.status-line.err .dot { background: #ef4444; }
+.hint { font-size: 0.7rem; color: #64748b; margin-top: 0.5rem; }
+.hint a { color: #60a5fa; text-decoration: none; border-bottom: 1px dotted #1e40af; }
+.drop { border: 2px dashed #334155; border-radius: 4px; padding: 1.5rem 1rem; text-align: center; cursor: pointer; position: relative; transition: all 0.15s; }
+.drop:hover { border-color: #b45309; background: rgba(245,158,11,0.03); }
+.drop input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.drop .icon { font-size: 2rem; opacity: 0.5; margin-bottom: 0.4rem; }
+.drop .txt { font-size: 0.82rem; color: #94a3b8; }
+.drop .txt strong { color: #fcd34d; }
+.drop .sub2 { font-size: 0.68rem; color: #475569; margin-top: 0.4rem; font-family: ui-monospace, monospace; }
+.thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 0.5rem; margin-top: 0.8rem; }
+.thumb { position: relative; border-radius: 4px; overflow: hidden; border: 1px solid #1e293b; aspect-ratio: 3/4; background: #000; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb .rm { position: absolute; top: 0.3rem; right: 0.3rem; background: rgba(220,38,38,0.85); color: #fff; border: none; width: 22px; height: 22px; border-radius: 50%; font-size: 0.7rem; cursor: pointer; }
+.thumb .lbl { position: absolute; bottom: 0; left: 0; right: 0; padding: 0.2rem 0.4rem; background: linear-gradient(transparent, rgba(2,6,23,0.9)); font-size: 0.52rem; font-family: ui-monospace, monospace; color: #fcd34d; letter-spacing: 0.08em; }
+.phase { background: #0f172a; border: 1px solid #1e293b; border-left: 2px solid #8b5cf6; border-radius: 4px; padding: 0.85rem 1rem; margin-bottom: 1rem; display: none; }
+.phase.visible { display: block; }
+.steps { display: flex; gap: 0.3rem; margin-bottom: 0.6rem; flex-wrap: wrap; }
+.step { flex: 1; min-width: 60px; padding: 0.4rem 0.3rem; text-align: center; font-size: 0.52rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; background: #020617; border: 1px solid #1e293b; border-radius: 4px; color: #475569; }
+.step.active { background: rgba(245,158,11,0.08); border-color: #b45309; color: #fcd34d; }
+.step.done { background: rgba(16,185,129,0.08); border-color: #065f46; color: #34d399; }
+.phase-info { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.4rem; font-size: 0.72rem; font-family: ui-monospace, monospace; color: #94a3b8; }
+.queue { display: none; background: #0f172a; border: 1px solid #1e293b; border-left: 2px solid #8b5cf6; border-radius: 4px; padding: 0.7rem 0.9rem; margin-bottom: 1rem; font-size: 0.72rem; font-family: ui-monospace, monospace; }
+.queue.visible { display: block; }
+.grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+@media (min-width: 640px) { .grid { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 1024px) { .grid { grid-template-columns: 1fr 1fr 1fr; } }
+.photo { background: #0f172a; border: 1px solid #1e293b; border-radius: 4px; overflow: hidden; }
+.photo-img { aspect-ratio: 9/16; background: #000; display: flex; align-items: center; justify-content: center; position: relative; }
+.photo-img img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.photo-img .load { width: 100%; height: 100%; background: #020617; display: flex; align-items: center; justify-content: center; color: #475569; font-size: 0.72rem; font-family: ui-monospace, monospace; position: relative; overflow: hidden; }
+.photo-img .load::after { content: ''; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 30%, rgba(245,158,11,0.06) 50%, transparent 70%); animation: shim 1.8s linear infinite; }
+@keyframes shim { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+.photo-img .err { width: 100%; height: 100%; background: rgba(127,29,29,0.2); display: flex; align-items: center; justify-content: center; color: #f87171; font-size: 0.72rem; }
+.photo-meta { padding: 0.7rem; border-top: 1px solid #1e293b; }
+.pbadge { display: inline-block; font-size: 0.52rem; text-transform: uppercase; letter-spacing: 0.1em; padding: 0.12rem 0.4rem; border-radius: 2px; margin-right: 0.3rem; margin-bottom: 0.4rem; font-weight: 700; border: 1px solid; }
+.pbadge.agent { background: rgba(245,158,11,0.1); color: #fbbf24; border-color: #92400e; }
+.pbadge.univ { background: rgba(59,130,246,0.1); color: #60a5fa; border-color: #1e40af; }
+.pbadge.comp { background: rgba(139,92,246,0.1); color: #a78bfa; border-color: #5b21b6; }
+.pbadge.cf { background: rgba(239,68,68,0.1); color: #f87171; border-color: #7f1d1d; }
+.pbadge.obj { background: rgba(16,185,129,0.1); color: #34d399; border-color: #065f46; }
+.ptitle { font-family: Georgia, serif; font-size: 0.85rem; color: #fcd34d; margin-bottom: 0.5rem; }
+.pblock { background: #020617; border: 1px solid #1e293b; border-radius: 4px; padding: 0.5rem; margin-bottom: 0.4rem; position: relative; }
+.pblock.video { border-left: 2px solid #7c3aed; }
+.plabel { font-size: 0.52rem; text-transform: uppercase; letter-spacing: 0.12em; color: #64748b; font-family: ui-monospace, monospace; margin-bottom: 0.25rem; }
+.pblock.video .plabel { color: #a78bfa; }
+.ptext { font-size: 0.65rem; color: #94a3b8; font-family: ui-monospace, monospace; line-height: 1.45; max-height: 80px; overflow-y: auto; white-space: pre-wrap; word-break: break-word; }
+.pcopy { position: absolute; top: 0.3rem; right: 0.3rem; font-size: 0.52rem; padding: 0.1rem 0.35rem; border: 1px solid #334155; border-radius: 2px; background: transparent; color: #64748b; cursor: pointer; }
+.pcopy:hover { color: #fcd34d; border-color: #b45309; }
+.popen { display: block; text-align: center; margin-top: 0.5rem; font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.12em; padding: 0.35rem; border: 1px solid #334155; border-radius: 4px; color: #94a3b8; text-decoration: none; }
+.popen:hover { color: #fcd34d; border-color: #b45309; }
+.panel { position: fixed; bottom: 0; left: 0; right: 0; z-index: 40; }
+.handle { background: #0f172a; border-top: 2px solid #b45309; padding: 0.55rem 1rem; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
+.handle .left { display: flex; align-items: center; gap: 0.6rem; min-width: 0; flex: 1; }
+.handle .toggle { font-family: ui-monospace, monospace; font-size: 0.72rem; color: #fbbf24; letter-spacing: 0.1em; flex-shrink: 0; }
+.handle .latest { font-size: 0.72rem; color: #94a3b8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.handle .actions { display: flex; gap: 0.3rem; }
+.handle .actions button { font-size: 0.6rem; padding: 0.2rem 0.5rem; border: 1px solid #334155; border-radius: 3px; background: transparent; color: #64748b; cursor: pointer; }
+.handle .actions button:hover { color: #fcd34d; border-color: #b45309; }
+.panel-content { background: #020617; border-top: 1px solid #1e293b; max-height: 60vh; overflow-y: auto; }
+.panel-content.hidden { display: none; }
+.human-log { max-height: 100px; overflow-y: auto; padding: 0.6rem 1rem; border-bottom: 1px solid #1e293b; font-family: ui-monospace, monospace; font-size: 0.7rem; }
+.human-log > div { margin-bottom: 0.2rem; }
+.human-log .t { color: #475569; }
+.human-log .m { color: #34d399; }
+.debug-log { max-height: 240px; overflow-y: auto; padding: 0.6rem 1rem; font-family: ui-monospace, monospace; font-size: 0.68rem; }
+.debug-log > div { margin-bottom: 0.15rem; word-break: break-word; }
+.debug-log .t { color: #475569; }
+.debug-log .info { color: #94a3b8; }
+.debug-log .ok { color: #34d399; }
+.debug-log .warn { color: #fbbf24; }
+.debug-log .err { color: #f87171; }
+.debug-log .api { color: #60a5fa; }
+.toast { position: fixed; top: 1rem; left: 50%; transform: translateX(-50%) translateY(-120px); background: #0f172a; border: 1px solid #1e293b; border-left: 3px solid #fbbf24; border-radius: 4px; padding: 0.75rem 1.2rem; font-size: 0.8rem; z-index: 1000; opacity: 0; transition: transform 0.3s, opacity 0.3s; max-width: 90vw; text-align: center; }
+.toast.visible { transform: translateX(-50%) translateY(0); opacity: 1; }
+.toast.success { border-left-color: #10b981; } .toast.error { border-left-color: #ef4444; } .toast.warn { border-left-color: #f59e0b; }
+.status-bar { position: fixed; bottom: 60px; left: 0; right: 0; background: #0f172a; border-top: 1px solid #1e293b; padding: 0.5rem 1rem; font-size: 0.7rem; font-family: ui-monospace, monospace; color: #f1f5f9; display: flex; align-items: center; gap: 0.5rem; transform: translateY(100%); transition: transform 0.3s; z-index: 30; }
+.status-bar.visible { transform: translateY(0); }
+.status-bar .spinner { width: 12px; height: 12px; border: 2px solid rgba(245,158,11,0.2); border-top-color: #f59e0b; border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.sessions-list { max-height: 200px; overflow-y: auto; margin-top: 0.5rem; }
+.session-row { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.7rem; background: #020617; border: 1px solid #1e293b; border-radius: 4px; margin-bottom: 0.35rem; font-size: 0.72rem; }
+.session-row.current { border-color: #b45309; background: rgba(245,158,11,0.05); }
+.session-row .s-meta { flex: 1; min-width: 0; }
+.session-row .s-title { color: #e2e8f0; font-family: Georgia, serif; font-size: 0.78rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.session-row .s-sub { color: #64748b; font-size: 0.62rem; font-family: ui-monospace, monospace; }
+.session-row button { flex-shrink: 0; }
+.agents-view { background: #0f172a; border: 1px solid #1e293b; border-radius: 4px; padding: 0.85rem 1rem; margin-bottom: 1rem; font-size: 0.72rem; }
+.agents-view h3 { font-family: Georgia, serif; font-size: 0.9rem; color: #fcd34d; margin-bottom: 0.5rem; }
+.agents-view .agent-group { margin-bottom: 0.6rem; }
+.agents-view .agent-group-label { color: #a78bfa; text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.58rem; margin-bottom: 0.3rem; }
+.agents-view .agent-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.agents-view .agent-tag { padding: 0.15rem 0.5rem; background: #020617; border: 1px solid #1e293b; border-radius: 2px; color: #94a3b8; font-family: ui-monospace, monospace; font-size: 0.62rem; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #0f172a; }
+::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+<div class="kata">武 · Kata · Multi-Style</div>
+<h1>Photo Transformer</h1>
+<p class="sub">Une image source → des dizaines de styles · Agents générés par l'IA · Sessions persistantes</p>
+</header>
+
+<div class="banner">
+<strong>Le laboratoire :</strong> vous validez vos <strong class="hl-v">clés API</strong>, choisissez un <strong class="hl-a">style visuel</strong>, ajoutez vos <strong class="hl-e">images de référence</strong>. L'IA <strong class="hl-v">génère elle-même ses agents</strong> (photographes, univers, compositions, contrechamps) adaptés au style, analyse chaque image, puis produit ~50 transformations par référence. Chaque photo est sauvegardée par son <strong class="hl-e">identifiant Agnès</strong> — vous les retrouvez à chaque session.
+</div>
+
+<section class="card">
+<div class="card-head"><span>🔑 Clés API Agnès</span><span class="badge" id="keyBadge">0 validée</span></div>
+<div class="card-body">
+<textarea id="keysInput" placeholder="Collez vos clés API ici, une par ligne :&#10;sk-xxxxxxxxxxxx" autocomplete="off" spellcheck="false"></textarea>
+<div class="row">
+<button class="btn btn-amber" id="validateBtn">🔐 Valider et enregistrer</button>
+<button class="btn btn-slate no-flex" id="clearBtn">Effacer</button>
+</div>
+<div class="status-line" id="keyStatus"><span class="dot"></span><span id="keyStatusText">Aucune clé enregistrée</span></div>
+<div class="hint">Clé gratuite sur <a href="https://platform.agnes-ai.com" target="_blank">platform.agnes-ai.com</a> → Settings → API Keys.</div>
+</div>
+</section>
+
+<section class="card">
+<div class="card-head"><span>🎨 Style visuel</span></div>
+<div class="card-body">
+<select id="styleSelect"></select>
+<div class="hint" id="styleHint" style="margin-top:0.5rem;"></div>
+</div>
+</section>
+
+<section class="card">
+<div class="card-head"><span>🖼️ Images de référence</span><span class="badge" id="refBadge">0 image</span></div>
+<div class="card-body">
+<label class="drop">
+<input type="file" accept="image/*" multiple id="refInput">
+<div class="icon">📷</div>
+<div class="txt"><strong>Cliquez pour choisir des images</strong><br>Personnages, lieux, objets…</div>
+<div class="sub2">~50 photos générées par image.</div>
+</label>
+<div class="thumbs" id="thumbs"></div>
+</div>
+</section>
+
+<section class="card">
+<div class="card-head"><span>📚 Sessions sauvegardées</span><span class="badge" id="sessionBadge">0 session</span></div>
+<div class="card-body">
+<div class="row">
+<button class="btn btn-slate" id="newSessionBtn">+ Nouvelle session</button>
+<button class="btn btn-slate" id="exportBtn">📤 Exporter</button>
+<button class="btn btn-slate no-flex" id="importBtn" style="position:relative;overflow:hidden;">📥 Importer<input type="file" accept=".json" id="importInput" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;"></button>
+</div>
+<div class="sessions-list" id="sessionsList"></div>
+<div class="hint" id="storageHint"></div>
+</div>
+</section>
+
+<button class="btn btn-amber" id="genBtn" disabled style="margin-bottom:1rem;">Lancer la transformation</button>
+<button class="btn btn-red hidden" id="stopBtn" style="margin-bottom:1rem;">⏹ Arrêter</button>
+
+<div class="phase" id="phaseBar">
+<div class="steps">
+<div class="step" data-p="agents">1 · Agents IA</div>
+<div class="step" data-p="analyze">2 · Analyse</div>
+<div class="step" data-p="transforms">3 · Transformations</div>
+<div class="step" data-p="universes">4 · Univers</div>
+<div class="step" data-p="counterfields">5 · Contrechamps</div>
+<div class="step" data-p="objects">6 · Objets</div>
+<div class="step" data-p="done">7 · Fini</div>
+</div>
+<div class="phase-info"><span id="phaseDetail">En attente</span><span id="phaseEta"></span></div>
+</div>
+
+<div class="queue" id="queue"></div>
+
+<div id="agentsView" class="agents-view hidden"></div>
+
+<div id="resultsHeader" class="hidden" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.8rem;flex-wrap:wrap;gap:0.5rem;">
+<div class="serif" style="font-size:1.05rem;letter-spacing:0.15em;text-transform:uppercase;">📸 Transformations</div>
+<div id="resultsCount" style="font-size:0.72rem;font-family:ui-monospace,monospace;color:#94a3b8;">0 / 0</div>
+</div>
+<div class="grid" id="photoGrid"></div>
+
+</div>
+
+<div class="panel">
+<div class="handle" id="panelHandle">
+<div class="left">
+<span class="toggle" id="panelToggle">▼ CONSOLE</span>
+<span class="latest" id="humanLatest">Prêt.</span>
+</div>
+<div class="actions">
+<button id="copyConsoleBtn">Copier</button>
+<button id="clearConsoleBtn">Effacer</button>
+</div>
+</div>
+<div class="panel-content hidden" id="panelContent">
+<div class="human-log" id="humanLog"></div>
+<div class="debug-log" id="debugLog"></div>
+</div>
+</div>
+
+<div class="toast" id="toast"><span id="toastText">Message</span></div>
+<div class="status-bar" id="statusBar"><div class="spinner"></div><span id="statusText">Préparation…</span></div>
+
+<script>
+'use strict';
+
+// ============ CONFIG ============
+const API_BASE = 'https://apihub.agnes-ai.com/v1';
+const MODEL_TEXT = 'agnes-2.5-flash';
+const MODEL_IMAGE = 'agnes-image-2.1-flash';
+const IMAGE_SIZE = '1024x1792';
+const CONCURRENCY_PER_KEY = 2;
+const DELAY_PER_KEY_MS = 3400;
+const REF_MAX_SIDE = 1280;
+const THUMB_MAX_SIDE = 100;
+const STORAGE_KEYS = { keys: 'kata_keys_v4', sessions: 'kata_sessions_v4', current: 'kata_current_v4' };
+const DEBUG_MAX = 400;
+const QUOTA_LIMIT = 3_800_000; // ~3.8 MB safety margin under 5 MB
+
+// ============ STYLES ============
+const STYLES = [
+  { id: 'hyperreal', name: 'Hyperréaliste photographique', hint: 'Photographie documentaire hyperréaliste, texture de peau, grain, aucun CGI, aucun art numérique' },
+  { id: 'cinema35', name: 'Cinématographique argentique', hint: 'Cinéma 35mm, format anamorphique, grain argentique, cinéma classique, Kubrick / Villeneuve / Fincher' },
+  { id: 'ghibli', name: 'Animation japonaise (Ghibli)', hint: 'Style Miyazaki / Takahata, aquarelle, douceur, nature luxuriante, ciel peint' },
+  { id: 'pixar', name: 'Animation 3D (Pixar / Disney)', hint: 'Rendu 3D, éclairage cinématographique, personnages stylisés, materiaux riches' },
+  { id: 'bdfr', name: 'BD franco-belge (Moebius / Bilal)', hint: 'Ligne claire ou dessin anguleux, encrage, couleurs saturées, planches BD' },
+  { id: 'comicus', name: 'Comic américain', hint: 'Marvel / DC, encrage fort, trames Ben-Day, couleurs pop, cases dynamiques' },
+  { id: 'aquarelle', name: 'Aquarelle', hint: 'Peinture aquarelle, lavis, bords diffus, transparence, papier texturé' },
+  { id: 'huile', name: 'Huile sur toile classique', hint: 'Peinture à l\'huile, texture, glacis, classicisme ou impressionnisme' },
+  { id: 'cyberpunk', name: 'Cyberpunk / Néon', hint: 'Néons, pluie, chrome, hologrammes, dystopie urbaine, Blade Runner' },
+  { id: 'steampunk', name: 'Steampunk / Dieselpunk', hint: 'Cuivre, vapeur, engrenages, machines victoriennes, Jules Verne' },
+  { id: 'postapo', name: 'Post-apocalyptique', hint: 'Ruines, désolation, végétation qui reprend, poussière, Mad Max' },
+  { id: 'fantasy', name: 'Fantasy médiéval', hint: 'Médiéval fantastique, châteaux, forêts anciennes, magie, dragons' },
+  { id: 'scifiretro', name: 'SF rétro (années 50-70)', hint: 'Fusées chromées, casques en bulle, optimisme atomique, Pulp' },
+  { id: 'noirbw', name: 'Noir et blanc argentique', hint: 'Noir et blanc, grain, clair-obscur, film noir, Cartier-Bresson' },
+  { id: 'popart', name: 'Sérigraphie pop art (Warhol)', hint: 'Sérigraphie, aplats de couleurs, contraste pop, Lichtenstein' },
+  { id: 'pixelart', name: 'Pixel art / 8-bit', hint: 'Pixel art, sprites, palettes limitées, arcade rétro' },
+  { id: 'croquis', name: 'Croquis au crayon / fusain', hint: 'Crayon, fusain, esquisse, hachures, papier, académie' },
+  { id: 'artnouveau', name: 'Art nouveau / Art déco', hint: 'Courbes végétales, dorures, géométrie déco, affiches Mucha' },
+  { id: 'surreal', name: 'Rêve surréaliste (Dalí / Magritte)', hint: 'Surréalisme, symboles flottants, ciel impossible, onirisme' },
+  { id: 'manga', name: 'Manga / Anime noir et blanc', hint: 'Manga, trames, cases, dynamisme, encrage japonais' },
+  { id: 'vaporwave', name: 'Vaporwave / Synthwave', hint: 'Grilles néon, couchers de soleil 80s, VHS, glitch, aérographe' }
+];
+
+// ============ STATE ============
+const state = {
+  apiKeys: [],
+  referenceImages: [],
+  referenceThumbs: [],
+  styleId: 'hyperreal',
+  agents: null,           // AI-generated structure
+  analyses: [],
+  sessions: [],
+  currentSession: null,
+  isRunning: false,
+  stopRequested: false,
+  completed: 0,
+  total: 0,
+  startTime: 0,
+  keyIndex: 0,
+  humanLog: [],
+  debugLog: []
+};
+
+// ============ UTILS ============
+const $ = id => document.getElementById(id);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const uid = () => 's_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7);
+
+function human(msg) {
+  state.humanLog.push({ t: new Date().toLocaleTimeString('fr-FR', { hour12: false }), m: msg });
+  if (state.humanLog.length > 80) state.humanLog.shift();
+  const el = $('humanLatest'); if (el) el.textContent = msg;
+  renderHuman();
+}
+function renderHuman() {
+  const el = $('humanLog'); if (!el) return;
+  el.innerHTML = state.humanLog.slice(-30).map(e => '<div><span class="t">' + e.t + '</span> <span class="m">' + esc(e.m) + '</span></div>').join('');
+  el.scrollTop = el.scrollHeight;
+}
+function debug(msg, level = 'info') {
+  state.debugLog.push({ t: new Date().toLocaleTimeString('fr-FR', { hour12: false }), m: msg, c: level });
+  if (state.debugLog.length > DEBUG_MAX) state.debugLog.shift();
+  renderDebug();
+}
+function renderDebug() {
+  const el = $('debugLog'); if (!el) return;
+  el.innerHTML = state.debugLog.slice(-200).map(e => '<div><span class="t">' + e.t + '</span> <span class="' + e.c + '">' + esc(e.m) + '</span></div>').join('');
+  el.scrollTop = el.scrollHeight;
+}
+function toast(msg, type = 'success', dur = 2500) {
+  const t = $('toast');
+  t.className = 'toast ' + type + ' visible';
+  $('toastText').textContent = msg;
+  clearTimeout(t._tid);
+  t._tid = setTimeout(() => { t.className = 'toast ' + type; }, dur);
+}
+function setStatus(txt) {
+  const b = $('statusBar');
+  if (txt) { b.classList.add('visible'); $('statusText').textContent = txt; }
+  else b.classList.remove('visible');
+}
+function setPhase(phase, detail, eta) {
+  const order = ['agents','analyze','transforms','universes','counterfields','objects','done'];
+  const idx = order.indexOf(phase);
+  document.querySelectorAll('.step').forEach(el => {
+    const i = order.indexOf(el.dataset.p);
+    el.className = 'step' + (i < idx ? ' done' : i === idx ? ' active' : '');
+  });
+  $('phaseDetail').textContent = detail || '';
+  $('phaseEta').textContent = eta || '';
+}
+function fmtEta(s) { return s < 60 ? Math.round(s) + 's' : Math.floor(s / 60) + 'm ' + Math.round(s % 60) + 's'; }
+function getKey() {
+  if (state.apiKeys.length === 0) return '';
+  const k = state.apiKeys[state.keyIndex % state.apiKeys.length];
+  state.keyIndex++;
+  return k;
+}
+
+// ============ PHOTO ID EXTRACTION ============
+function idFromUrl(url) {
+  if (!url || typeof url !== 'string') return null;
+  if (url.startsWith('data:')) return null; // too big to save
+  try {
+    const u = new URL(url);
+    const segs = u.pathname.split('/').filter(Boolean);
+    if (segs.length === 0) return null;
+    const last = segs[segs.length - 1];
+    const m = last.match(/^(.*?)(\.(png|jpg|jpeg|webp|gif))?$/i);
+    const ext = m[2] || '.png';
+    const id = m[1];
+    const base = u.origin + '/' + segs.slice(0, -1).join('/');
+    return { base, id, ext, full: url };
+  } catch (e) { return { base: '', id: url, ext: '', full: url }; }
+}
+function urlFromId(o) {
+  if (!o) return null;
+  if (o.full && !o.id) return o.full;
+  if (!o.id) return null;
+  if (!o.base) return o.id;
+  return o.base + '/' + o.id + (o.ext || '');
+}
+
+// ============ STORAGE (sessions) ============
+function estimateSize(obj) { try { return new Blob([JSON.stringify(obj)]).size; } catch (e) { return 999999; } }
+
+function loadFromStorage() {
+  try { state.apiKeys = JSON.parse(localStorage.getItem(STORAGE_KEYS.keys) || '[]'); } catch (e) { state.apiKeys = []; }
+  try { state.sessions = JSON.parse(localStorage.getItem(STORAGE_KEYS.sessions) || '[]'); } catch (e) { state.sessions = []; }
+  try {
+    const cid = localStorage.getItem(STORAGE_KEYS.current);
+    state.currentSession = state.sessions.find(s => s.id === cid) || null;
+  } catch (e) { state.currentSession = null; }
+}
+
+function saveSessions() {
+  let sessions = state.sessions;
+  let size = estimateSize(sessions);
+  let dropped = 0;
+  while (size > QUOTA_LIMIT && sessions.length > 1) {
+    sessions = sessions.slice(1);
+    size = estimateSize(sessions);
+    dropped++;
+  }
+  if (dropped > 0) {
+    debug('Quota : ' + dropped + ' ancienne(s) session(s) supprimée(s)', 'warn');
+    human('⚠️ ' + dropped + ' session(s) ancienne(s) supprimée(s) pour libérer de la place');
+  }
+  state.sessions = sessions;
+  try {
+    localStorage.setItem(STORAGE_KEYS.sessions, JSON.stringify(sessions));
+    updateStorageHint();
+    return true;
+  } catch (e) {
+    debug('Écriture sessions impossible : ' + e.message, 'err');
+    // Emergency : ne garder que les 2 plus récentes
+    try {
+      const reduced = sessions.slice(-2);
+      localStorage.setItem(STORAGE_KEYS.sessions, JSON.stringify(reduced));
+      state.sessions = reduced;
+      debug('Réduction d\'urgence à 2 sessions', 'warn');
+      return true;
+    } catch (e2) {
+      debug('Échec total de sauvegarde sessions', 'err');
+      return false;
+    }
+  }
+}
+
+function saveKeys() {
+  try { localStorage.setItem(STORAGE_KEYS.keys, JSON.stringify(state.apiKeys)); } catch (e) { debug('Écriture clés : ' + e.message, 'err'); }
+}
+
+function saveCurrentId() {
+  try {
+    if (state.currentSession) localStorage.setItem(STORAGE_KEYS.current, state.currentSession.id);
+    else localStorage.removeItem(STORAGE_KEYS.current);
+  } catch (e) {}
+}
+
+function updateStorageHint() {
+  const used = estimateSize(state.sessions);
+  const pct = Math.round(used / 5_000_000 * 100);
+  $('storageHint').textContent = 'Stockage sessions : ' + Math.round(used / 1024) + ' Ko (' + pct + '% du quota) · ' + state.sessions.length + ' session(s)';
+  $('sessionBadge').textContent = state.sessions.length + ' session' + (state.sessions.length > 1 ? 's' : '');
+}
+
+function createNewSession(style, refThumbs) {
+  const s = {
+    id: uid(),
+    date: Date.now(),
+    style,
+    styleName: (STYLES.find(x => x.id === style) || {}).name || style,
+    refThumbs: refThumbs || [],   // tiny base64 thumbnails only
+    agents: null,
+    analyses: [],
+    photos: []                    // { urlRef: {base,id,ext,full}, title, kind, agent, universe, comp, refIdx }
+  };
+  state.sessions.push(s);
+  state.currentSession = s;
+  saveSessions();
+  saveCurrentId();
+  return s;
+}
+
+// ============ API : VALIDATION RAPIDE ============
+function isValidKeyFormat(k) { return typeof k === 'string' && k.startsWith('sk-') && k.length >= 15 && k.length <= 200; }
+
+async function quickPing(key) {
+  try {
+    const controller = new AbortController();
+    const tid = setTimeout(() => controller.abort(), 4000);
+    const res = await fetch(API_BASE + '/chat/completions', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: MODEL_TEXT, messages: [{ role: 'user', content: 'ok' }], max_tokens: 1 }),
+      signal: controller.signal
+    });
+    clearTimeout(tid);
+    return res.status !== 401 && res.status !== 403;
+  } catch (e) { return null; }
+}
+
+async function validateAndSaveKeys() {
+  const raw = $('keysInput').value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+  if (raw.length === 0) { toast('Aucune clé à valider', 'error'); return; }
+  $('validateBtn').disabled = true;
+  $('validateBtn').textContent = '⏳ Validation…';
+  human('🔐 Validation de ' + raw.length + ' clé(s)…');
+  const valid = [];
+  for (let i = 0; i < raw.length; i++) {
+    const k = raw[i];
+    if (!isValidKeyFormat(k)) { debug('Clé ' + (i + 1) + ' : format invalide', 'err'); continue; }
+    const ping = await quickPing(k);
+    if (ping === false) { debug('Clé ' + (i + 1) + ' : refusée', 'err'); continue; }
+    valid.push(k);
+    debug('Clé ' + (i + 1) + ' : OK', 'ok');
+  }
+  state.apiKeys = valid;
+  saveKeys();
+  const st = $('keyStatus');
+  if (valid.length > 0) { st.className = 'status-line ok'; $('keyStatusText').textContent = valid.length + ' clé(s) enregistrée(s) · rotation auto'; }
+  else { st.className = 'status-line err'; $('keyStatusText').textContent = 'Aucune clé valide'; }
+  $('validateBtn').disabled = false;
+  $('validateBtn').textContent = '🔐 Valider et enregistrer';
+  updateKeyBadge();
+  toast(valid.length + ' clé(s) enregistrée(s)', valid.length > 0 ? 'success' : 'error', 3000);
+}
+
+function updateKeyBadge() { $('keyBadge').textContent = state.apiKeys.length + ' validée' + (state.apiKeys.length > 1 ? 's' : ''); updateGenBtn(); }
+function updateRefBadge() { $('refBadge').textContent = state.referenceImages.length + ' image' + (state.referenceImages.length > 1 ? 's' : ''); updateGenBtn(); }
+function updateGenBtn() {
+  const btn = $('genBtn');
+  const ok = state.apiKeys.length > 0 && state.referenceImages.length > 0 && !state.isRunning;
+  btn.disabled = !ok;
+  if (state.isRunning) btn.textContent = 'Génération en cours…';
+  else if (state.apiKeys.length === 0) btn.textContent = 'Validez vos clés API';
+  else if (state.referenceImages.length === 0) btn.textContent = 'Ajoutez des images de référence';
+  else btn.textContent = 'Lancer · ~' + (state.referenceImages.length * 40 + 10) + ' transformations';
+}
+
+// ============ API : ANALYSE D'IMAGE ============
+async function apiAnalyze(dataUrl) {
+  const key = getKey(); if (!key) return null;
+  try {
+    const res = await fetch(API_BASE + '/chat/completions', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: MODEL_TEXT,
+        messages: [
+          { role: 'system', content: 'You are a visual analyst. Return ONLY valid JSON on single lines.' },
+          { role: 'user', content: [
+            { type: 'text', text: 'Analyze this image deeply. Return JSON: {"subject":"who or what is the main subject","setting":"precise location description","universe":"genre of scene (e.g. rural French countryside, neon cyberpunk city, Victorian steampunk laboratory, ancient Japanese temple)","era":"time period or timeless","colors":"dominant colors and palette","lighting":"lighting conditions","mood":"emotional tone","composition":"how the image is framed","counterfield":"what would be facing the subject if the camera turned 180 degrees"}' },
+            { type: 'image_url', image_url: { url: dataUrl } }
+          ] }
+        ],
+        temperature: 0.3, max_tokens: 900, response_format: { type: 'json_object' }
+      })
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const c = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+    try { return JSON.parse(c); } catch (e) { return null; }
+  } catch (e) { return null; }
+}
+
+// ============ API : GENERATION D'AGENTS PAR L'IA ============
+async function apiGenerateAgents(style, analyses) {
+  const key = getKey(); if (!key) return null;
+  const styleMeta = STYLES.find(s => s.id === style) || { name: style, hint: '' };
+  const universeContext = analyses.filter(a => a).map(a => '- ' + (a.universe || 'unknown') + ' (' + (a.setting || '?') + ')').join('\n') || '(pas encore analysé)';
+
+  const prompt = [
+    'You are the creative director of a photo transformation studio.',
+    'Your mission: design ALL the agents that will transform reference photos into a chosen visual style.',
+    '',
+    'SELECTED STYLE: ' + styleMeta.name,
+    'STYLE BRIEF: ' + styleMeta.hint,
+    '',
+    'UNIVERSES DETECTED IN REFERENCES:',
+    universeContext,
+    '',
+    'Design a complete transformation system. Return ONLY valid JSON with this exact schema:',
+    '{',
+    '  "style_name": "short name",',
+    '  "style_description": "one sentence",',
+    '  "agents": [',
+    '    {"name":"short distinctive name","prompt":"short prompt suffix (max 30 words) capturing a unique interpretation technique or master in this style"},',
+    '    ... exactly 10 agents',
+    '  ],',
+    '  "universes": [',
+    '    {"name":"short scene name","prompt":"short prompt suffix (max 30 words) describing a scene or environment the subject could be placed in — MUST be coherent with the detected universes above or extrapolate the style"},',
+    '    ... exactly 10 universes',
+    '  ],',
+    '  "compositions": [',
+    '    {"name":"shot type name","prompt":"short camera / framing directive (max 20 words)"},',
+    '    ... exactly 10 compositions',
+    '  ],',
+    '  "counterfields": [',
+    '    {"name":"short name","prompt":"what the camera would see if turned 180 degrees from the subject (max 25 words)"},',
+    '    ... exactly 10 counterfields',
+    '  ],',
+    '  "vehicles": [',
+    '    {"name":"short name","prompt":"iconic vehicle of this style world (max 20 words)"},',
+    '    ... exactly 5',
+    '  ],',
+    '  "buildings": [',
+    '    {"name":"short name","prompt":"iconic building of this style world (max 20 words)"},',
+    '    ... exactly 5',
+    '  ]',
+    '}',
+    '',
+    'CRITICAL:',
+    '- Each agent prompt MUST be different enough to produce visually distinct results.',
+    '- Universes must feel like natural extensions of the references, in the chosen style.',
+    '- Counterfields must NOT resemble the original subject — they show what is opposite.',
+    '- No markdown, no commentary, only JSON.',
+    '- All strings on single lines.'
+  ].join('\n');
+
+  debug('Prompt agents envoyé (' + prompt.length + ' chars)', 'api');
+  const res = await fetch(API_BASE + '/chat/completions', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: MODEL_TEXT,
+      messages: [
+        { role: 'system', content: 'You are a creative director. You ALWAYS return valid JSON exactly matching the requested schema. No markdown.' },
+        { role: 'user', content: prompt }
+      ],
+      temperature: 0.9, max_tokens: 4000, response_format: { type: 'json_object' }
+    })
+  });
+  if (!res.ok) { const err = await res.text(); debug('Agents HTTP ' + res.status + ' · ' + err.slice(0, 200), 'err'); return null; }
+  const data = await res.json();
+  const c = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+  try {
+    const parsed = JSON.parse(c);
+    if (!parsed.agents || parsed.agents.length === 0) return null;
+    return parsed;
+  } catch (e) { debug('Parse agents échoué : ' + e.message, 'err'); return null; }
+}
+
+// ============ API : GENERATION D'IMAGE ============
+async function apiImage(prompt) {
+  const key = getKey(); if (!key) throw new Error('Aucune clé API');
+  for (let attempt = 0; attempt < 5; attempt++) {
+    if (state.stopRequested) throw new Error('Arrêt');
+    try {
+      const res = await fetch(API_BASE + '/images/generations', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: MODEL_IMAGE, prompt, n: 1, size: IMAGE_SIZE, response_format: 'url' })
+      });
+      if (res.status === 429) { await sleep([10, 20, 35, 50, 75][attempt] * 1000); continue; }
+      if (!res.ok) { const err = await res.text(); debug('HTTP ' + res.status + ' · ' + err.slice(0, 150), 'err'); throw new Error('HTTP ' + res.status); }
+      const data = await res.json();
+      const item = data.data && data.data[0];
+      if (item && item.url) return item.url;
+      if (item && item.b64_json) return 'data:image/png;base64,' + item.b64_json;
+      throw new Error('Réponse invalide');
+    } catch (e) {
+      if (e.message === 'Arrêt') throw e;
+      if (attempt === 4) throw e;
+      await sleep([5, 10, 20, 35][attempt] * 1000);
+    }
+  }
+  throw new Error('Échec');
+}
+
+// ============ BUILD PROMPTS ============
+function buildTransformPrompt(analysis, agent, style) {
+  const styleMeta = STYLES.find(s => s.id === style) || { hint: '' };
+  return 'Transform this reference into ' + styleMeta.name + ' style, interpretation by "' + agent.name + '". ' +
+    'Subject: ' + (analysis.subject || 'the subject') + '. ' +
+    'Source setting: ' + (analysis.setting || 'as reference') + '. ' +
+    'Source universe: ' + (analysis.universe || 'as reference') + '. ' +
+    'Colors: ' + (analysis.colors || 'as reference') + '. ' +
+    'Lighting: ' + (analysis.lighting || 'natural') + '. ' +
+    'Technique: ' + agent.prompt + '. ' +
+    'Style directive: ' + styleMeta.hint + '. ' +
+    'MUST remain recognizable as the same subject. Portrait 9:16 vertical. No text, no watermark.';
+}
+
+function buildUniversePrompt(analysis, agent, universe, style) {
+  const styleMeta = STYLES.find(s => s.id === style) || { hint: '' };
+  return 'Place the reference subject into a NEW scene in ' + styleMeta.name + ' style. ' +
+    'Subject: ' + (analysis.subject || 'the subject') + '. ' +
+    'New scene: ' + universe.prompt + '. ' +
+    'Keep: ' + (analysis.colors || 'coherent palette') + ', coherent lighting. ' +
+    'Technique: ' + agent.prompt + '. ' +
+    'Style: ' + styleMeta.hint + '. ' +
+    'Portrait 9:16 vertical. No text, no watermark.';
+}
+
+function buildCounterfieldPrompt(analysis, cf, style) {
+  const styleMeta = STYLES.find(s => s.id === style) || { hint: '' };
+  return 'Champ-contrechamp — camera faces 180° from the reference. Show what is OPPOSITE: ' + cf.prompt + '. ' +
+    'Context from reference: universe was ' + (analysis.universe || '?') + ', opposite is ' + (analysis.counterfield || '?') + '. ' +
+    'NO original subject. Different people (do not resemble original subjects). ' +
+    'Style: ' + styleMeta.name + ' — ' + styleMeta.hint + '. ' +
+    'Portrait 9:16. No text, no watermark.';
+}
+
+function buildObjectPrompt(obj, style) {
+  const styleMeta = STYLES.find(s => s.id === style) || { hint: '' };
+  return 'Iconic ' + (obj.kind || 'object') + ' in ' + styleMeta.name + ' style: ' + obj.prompt + '. ' +
+    'Style: ' + styleMeta.hint + '. ' +
+    'Portrait 9:16 vertical. No text, no watermark.';
+}
+
+function buildVideoPromptFromPhoto(photo) {
+  return 'Subject: ' + (photo.title || 'scene') + '. ' +
+    'Action: slow subtle movement, breathing, gentle camera drift. ' +
+    'Camera: ' + (photo.kind === 'counterfield' ? 'slow tracking shot' : 'static tripod, slight handheld drift') + '. ' +
+    'Style: ' + (photo.agentName || '') + ' · ' + (state.currentSession ? state.currentSession.styleName : '') + '. ' +
+    'Quality: film grain, photorealistic rendering, real texture. ' +
+    'Duration: 5 seconds. Aspect ratio: 9:16. No music, no text, no watermark.';
+}
+
+// ============ BUILD TASKS ============
+function buildAllTasks(agents, analyses) {
+  const tasks = [];
+  const refs = state.referenceImages;
+
+  for (let r = 0; r < refs.length; r++) {
+    const a = analyses[r] || {};
+    const style = state.currentSession.style;
+
+    // 10 agents × ref
+    agents.agents.forEach((ag, ai) => {
+      tasks.push({
+        kind: 'agent', refIdx: r, agentIdx: ai,
+        title: ag.name + ' — Ref ' + (r + 1),
+        agentName: ag.name, prompt: buildTransformPrompt(a, ag, style),
+        photo: { kind: 'agent', title: ag.name + ' — Ref ' + (r + 1), agentName: ag.name, refIdx: r, agentIdx: ai }
+      });
+    });
+
+    // 10 universes × ref
+    agents.universes.forEach((uv, ui) => {
+      tasks.push({
+        kind: 'universe', refIdx: r, agentIdx: ui,
+        title: uv.name + ' — Ref ' + (r + 1),
+        agentName: uv.name, prompt: buildUniversePrompt(a, agents.agents[ui % agents.agents.length], uv, style),
+        photo: { kind: 'universe', title: uv.name + ' — Ref ' + (r + 1), agentName: uv.name, universeName: uv.name, refIdx: r, agentIdx: ui }
+      });
+    });
+
+    // 10 compositions × ref
+    agents.compositions.forEach((comp, ci) => {
+      tasks.push({
+        kind: 'comp', refIdx: r, agentIdx: ci,
+        title: comp.name + ' — Ref ' + (r + 1),
+        agentName: comp.name, prompt: buildTransformPrompt(a, { name: comp.name, prompt: comp.prompt }, style),
+        photo: { kind: 'comp', title: comp.name + ' — Ref ' + (r + 1), agentName: comp.name, refIdx: r, agentIdx: ci }
+      });
+    });
+
+    // 10 counterfields × ref
+    agents.counterfields.forEach((cf, fi) => {
+      tasks.push({
+        kind: 'counterfield', refIdx: r, agentIdx: fi,
+        title: cf.name + ' — Ref ' + (r + 1),
+        agentName: cf.name, prompt: buildCounterfieldPrompt(a, cf, style),
+        photo: { kind: 'counterfield', title: cf.name + ' — Ref ' + (r + 1), agentName: cf.name, refIdx: r, agentIdx: fi }
+      });
+    });
+  }
+
+  // Shared objects : 5 véhicules + 5 bâtiments
+  agents.vehicles.forEach((v, i) => {
+    tasks.push({
+      kind: 'object', agentIdx: i,
+      title: v.name, agentName: v.name,
+      prompt: buildObjectPrompt({ kind: 'vehicle', prompt: v.prompt }, state.currentSession.style),
+      photo: { kind: 'object', title: v.name, agentName: v.name }
+    });
+  });
+  agents.buildings.forEach((b, i) => {
+    tasks.push({
+      kind: 'object', agentIdx: 100 + i,
+      title: b.name, agentName: b.name,
+      prompt: buildObjectPrompt({ kind: 'building', prompt: b.prompt }, state.currentSession.style),
+      photo: { kind: 'object', title: b.name, agentName: b.name }
+    });
+  });
+
+  return tasks;
+}
+
+// ============ PIPELINE PRINCIPAL ============
+async function runGeneration() {
+  if (state.isRunning) return;
+  if (state.apiKeys.length === 0) { toast('Validez vos clés API d\'abord', 'error'); return; }
+  if (state.referenceImages.length === 0) { toast('Ajoutez des images de référence', 'error'); return; }
+
+  state.isRunning = true;
+  state.stopRequested = false;
+  state.completed = 0; state.total = 0;
+  state.startTime = Date.now();
+  state.keyIndex = 0;
+
+  $('photoGrid').innerHTML = '';
+  $('resultsHeader').classList.add('hidden');
+  $('agentsView').classList.add('hidden');
+  $('stopBtn').classList.remove('hidden');
+  $('phaseBar').classList.add('visible');
+  $('genBtn').disabled = true;
+
+  // Nouvelle session
+  const tinyThumbs = state.referenceThumbs.slice();
+  const session = createNewSession(state.styleId, tinyThumbs);
+  renderSessionsList();
+  updateStorageHint();
+
+  human('🚀 Nouvelle session · ' + state.referenceImages.length + ' référence(s) · style ' + session.styleName);
+  debug('Session ' + session.id + ' créée', 'ok');
+
+  try {
+    // === PHASE 1 : AGENTS ===
+    setPhase('agents', '🧠 L\'IA conçoit ses agents pour le style…', '');
+    setStatus('Génération des agents…');
+    human('🧠 L\'IA conçoit ses agents pour ' + session.styleName + '…');
+    let agents = await apiGenerateAgents(state.styleId, []);
+    if (!agents) {
+      debug('Fallback : agents minimaux', 'warn');
+      agents = { style_name: session.styleName, style_description: '', agents: [{ name: 'Interprétation 1', prompt: state.styleId }], universes: [{ name: 'Scène naturelle', prompt: 'same universe as reference' }], compositions: [{ name: 'Vue naturelle', prompt: 'natural framing' }], counterfields: [{ name: 'Contrechamp', prompt: 'opposite view' }], vehicles: [], buildings: [] };
+    }
+    state.agents = agents;
+    session.agents = agents;
+    renderAgentsView(agents);
+    debug('Agents générés : ' + agents.agents.length + ' agents, ' + agents.universes.length + ' univers, ' + agents.compositions.length + ' comps, ' + agents.counterfields.length + ' contrechamps', 'ok');
+    human('✨ L\'IA a défini ' + (agents.agents.length + agents.universes.length + agents.compositions.length + agents.counterfields.length) + ' agents créatifs');
+
+    // === PHASE 2 : ANALYSE DES RÉFÉRENCES ===
+    setPhase('analyze', '🔍 Analyse des images de référence…', '');
+    setStatus('Analyse…');
+    human('🔍 J\'analyse ' + state.referenceImages.length + ' image(s)…');
+    const analyses = [];
+    for (let i = 0; i < state.referenceImages.length; i++) {
+      if (state.stopRequested) throw new Error('Arrêt');
+      human('🔍 Analyse ' + (i + 1) + '/' + state.referenceImages.length + '…');
+      const a = await apiAnalyze(state.referenceImages[i]);
+      analyses.push(a || {});
+      debug('Analyse ' + (i + 1) + ' : ' + (a ? (a.universe || 'OK') : 'fallback'), a ? 'ok' : 'warn');
+    }
+    state.analyses = analyses;
+    session.analyses = analyses;
+    human('✅ Analyse terminée');
+
+    // === BUILD TASKS ===
+    const tasks = buildAllTasks(agents, analyses);
+    state.total = tasks.length;
+    updateQueue();
+    human('🎬 ' + state.total + ' transformations prévues');
+
+    // === EXECUTION PARALLÈLE ===
+    const globalConcurrency = Math.min(state.apiKeys.length * CONCURRENCY_PER_KEY, tasks.length);
+    const lastStartPerKey = {};
+    let idx = 0;
+
+    async function worker(slot) {
+      while (!state.stopRequested && idx < tasks.length) {
+        const myIdx = idx++;
+        const task = tasks[myIdx];
+        const keySlot = slot % state.apiKeys.length;
+        const now = Date.now();
+        const wait = Math.max(0, (lastStartPerKey[keySlot] || 0) + DELAY_PER_KEY_MS - now);
+        lastStartPerKey[keySlot] = Date.now() + wait;
+        if (wait > 0) await sleep(wait);
+        if (state.stopRequested) return;
+
+        let url = null;
+        try {
+          url = await apiImage(task.prompt);
+          state.completed++;
+          debug('OK ' + state.completed + '/' + state.total + ' · ' + task.title, 'ok');
+          human('📸 ' + state.completed + '/' + state.total + ' · ' + task.title.slice(0, 40));
+        } catch (e) {
+          if (e.message === 'Arrêt') return;
+          state.completed++;
+          debug('KO · ' + task.title + ' · ' + e.message, 'err');
+        }
+
+        // Enregistrement dans la session
+        const p = Object.assign({}, task.photo);
+        p.urlRef = url ? idFromUrl(url) : null;
+        p.url = url || null;
+        if (p.urlRef && !p.urlRef.full) p.url = urlFromId(p.urlRef);
+        session.photos.push({
+          kind: p.kind,
+          title: p.title,
+          agentName: p.agentName || '',
+          universeName: p.universeName || '',
+          refIdx: p.refIdx,
+          agentIdx: p.agentIdx,
+          urlRef: p.urlRef
+        });
+
+        const phaseMap = { agent: 'transforms', universe: 'universes', comp: 'transforms', counterfield: 'counterfields', object: 'objects' };
+        setPhase(phaseMap[task.kind] || 'transforms',
+          '📸 ' + state.completed + ' / ' + state.total,
+          '~' + fmtEta((state.total - state.completed) * 3.5 / state.apiKeys.length));
+        updateQueue();
+        renderPhoto(p);
+        updateResultsHeader();
+      }
+    }
+
+    await Promise.all(Array.from({ length: globalConcurrency }, (_, i) => worker(i)));
+
+    if (state.stopRequested) throw new Error('Arrêt');
+
+    setPhase('done', '✦ Terminé ✦', '');
+    human('✨ ' + state.completed + ' transformations en ' + fmtEta((Date.now() - state.startTime) / 1000));
+    debug('FIN · session ' + session.id + ' · ' + session.photos.length + ' photos', 'ok');
+
+    // Sauvegarde finale
+    saveSessions();
+    updateStorageHint();
+
+  } catch (e) {
+    if (e.message === 'Arrêt') human('⏹ Arrêté');
+    else { debug('Erreur : ' + e.message, 'err'); human('❌ Erreur : ' + e.message); }
+    saveSessions();
+  } finally {
+    state.isRunning = false;
+    state.stopRequested = false;
+    $('stopBtn').classList.add('hidden');
+    updateGenBtn();
+    setStatus(null);
+    toast(state.completed + ' transformation(s)', state.completed > 0 ? 'success' : 'error', 4000);
+  }
+}
+
+function stopGeneration() {
+  if (!state.isRunning) return;
+  state.stopRequested = true;
+  human('⏹ Arrêt demandé…');
+}
+
+// ============ RENDERING ============
+function renderPhoto(p) {
+  const grid = $('photoGrid');
+  const card = document.createElement('div');
+  card.className = 'photo';
+  const kindMap = { agent: 'agent', universe: 'univ', comp: 'comp', counterfield: 'cf', object: 'obj' };
+  const kindLabel = { agent: '🎨 Agent', universe: '🌍 Univers', comp: '📐 Composition', counterfield: '🔄 Contrechamp', object: '🏗 Objet' };
+  const badge = kindMap[p.kind] || 'agent';
+  const label = kindLabel[p.kind] || 'Transformation';
+  const vp = buildVideoPromptFromPhoto(p);
+
+  const src = p.url || (p.urlRef ? urlFromId(p.urlRef) : null);
+  let imgHtml;
+  if (src && src !== 'error') imgHtml = '<img src="' + esc(src) + '" loading="lazy" alt="">';
+  else if (p.url === 'error') imgHtml = '<div class="err">Échec</div>';
+  else imgHtml = '<div class="load">Génération…</div>';
+
+  const fullPrompt = p.prompt || '';
+
+  card.innerHTML =
+    '<div class="photo-img">' + imgHtml + '</div>' +
+    '<div class="photo-meta">' +
+    '<span class="pbadge ' + badge + '">' + label + '</span>' +
+    '<span class="pbadge ' + badge + '">' + esc(p.agentName || '') + '</span>' +
+    '<div class="ptitle">' + esc(p.title) + '</div>' +
+    (fullPrompt ?
+      '<div class="pblock">' +
+      '<div class="plabel">📸 Prompt image</div>' +
+      '<button class="pcopy" data-copy="' + esc(fullPrompt) + '">Copier</button>' +
+      '<div class="ptext">' + esc(fullPrompt) + '</div>' +
+      '</div>' : '') +
+    '<div class="pblock video">' +
+    '<div class="plabel">🎬 Prompt vidéo</div>' +
+    '<button class="pcopy" data-copy="' + esc(vp) + '">Copier</button>' +
+    '<div class="ptext">' + esc(vp) + '</div>' +
+    '</div>' +
+    (src && src !== 'error' ? '<a class="popen" href="' + esc(src) + '" target="_blank" rel="noopener">Ouvrir</a>' : '') +
+    '</div>';
+
+  grid.appendChild(card);
+  card.querySelectorAll('[data-copy]').forEach(b => b.onclick = () => {
+    const ta = document.createElement('textarea');
+    ta.value = b.dataset.copy;
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); toast('Copié', 'success', 1500); } catch (e) { toast('Copie impossible', 'error'); }
+    document.body.removeChild(ta);
+  });
+}
+
+function renderFromSession(session) {
+  $('photoGrid').innerHTML = '';
+  $('resultsHeader').classList.remove('hidden');
+  $('agentsView').classList.add('hidden');
+  if (session.agents) renderAgentsView(session.agents);
+  const photos = session.photos.map(sp => ({
+    kind: sp.kind, title: sp.title, agentName: sp.agentName, universeName: sp.universeName,
+    prompt: '(prompt non sauvegardé — peut être régénéré)',
+    url: sp.urlRef ? urlFromId(sp.urlRef) : null
+  }));
+  photos.forEach(p => renderPhoto(p));
+  state.completed = photos.length;
+  state.total = photos.length;
+  updateResultsHeader();
+}
+
+function updateResultsHeader() {
+  const h = $('resultsHeader');
+  h.classList.remove('hidden');
+  h.style.display = 'flex';
+  $('resultsCount').textContent = state.completed + ' / ' + state.total;
+}
+
+function updateQueue() {
+  const q = $('queue');
+  q.classList.add('visible');
+  q.innerHTML = '<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.4rem;">' +
+    '<span style="color:#fcd34d;font-weight:700;">PHOTOS : ' + state.completed + ' / ' + state.total + '</span>' +
+    '<span style="color:#64748b;">' + (state.completed < state.total ? '~' + fmtEta((state.total - state.completed) * 3.5 / Math.max(1, state.apiKeys.length)) : 'Terminé') + '</span>' +
+    '</div>';
+}
+
+function renderAgentsView(agents) {
+  const el = $('agentsView');
+  el.classList.remove('hidden');
+  el.innerHTML =
+    '<h3>🧠 Agents conçus par l\'IA · ' + esc(agents.style_name || '') + '</h3>' +
+    (agents.style_description ? '<div style="color:#94a3b8;margin-bottom:0.6rem;">' + esc(agents.style_description) + '</div>' : '') +
+    renderAgentGroup('🎨 Interprétations', agents.agents) +
+    renderAgentGroup('🌍 Univers', agents.universes) +
+    renderAgentGroup('📐 Compositions', agents.compositions) +
+    renderAgentGroup('🔄 Contrechamps', agents.counterfields) +
+    renderAgentGroup('🚗 Véhicules', agents.vehicles || []) +
+    renderAgentGroup('🏛 Bâtiments', agents.buildings || []);
+}
+function renderAgentGroup(label, list) {
+  if (!list || list.length === 0) return '';
+  return '<div class="agent-group"><div class="agent-group-label">' + label + '</div><div class="agent-tags">' +
+    list.map(a => '<span class="agent-tag">' + esc(a.name) + '</span>').join('') +
+    '</div></div>';
+}
+
+function renderSessionsList() {
+  const el = $('sessionsList');
+  if (state.sessions.length === 0) { el.innerHTML = '<div style="text-align:center;color:#475569;font-size:0.72rem;padding:0.6rem;">Aucune session sauvegardée.</div>'; return; }
+  el.innerHTML = state.sessions.slice().reverse().map(s => {
+    const isCur = state.currentSession && state.currentSession.id === s.id;
+    const d = new Date(s.date).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' });
+    return '<div class="session-row' + (isCur ? ' current' : '') + '">' +
+      '<div class="s-meta">' +
+      '<div class="s-title">' + esc(s.styleName) + ' · ' + s.photos.length + ' photo(s)</div>' +
+      '<div class="s-sub">' + d + (isCur ? ' · ACTUELLE' : '') + '</div>' +
+      '</div>' +
+      '<button class="btn btn-slate btn-sm" data-load="' + s.id + '">Charger</button>' +
+      '<button class="btn btn-slate btn-sm" data-del="' + s.id + '" style="color:#f87171;">✕</button>' +
+      '</div>';
+  }).join('');
+  el.querySelectorAll('[data-load]').forEach(b => b.onclick = () => {
+    const s = state.sessions.find(x => x.id === b.dataset.load);
+    if (!s) return;
+    state.currentSession = s;
+    saveCurrentId();
+    if (s.agents) state.agents = s.agents;
+    renderFromSession(s);
+    renderSessionsList();
+    human('📚 Session chargée · ' + s.photos.length + ' photo(s)');
+    toast('Session chargée', 'success');
+  });
+  el.querySelectorAll('[data-del]').forEach(b => b.onclick = () => {
+    if (!confirm('Supprimer cette session ?')) return;
+    state.sessions = state.sessions.filter(x => x.id !== b.dataset.del);
+    if (state.currentSession && state.currentSession.id === b.dataset.del) state.currentSession = null;
+    saveSessions();
+    saveCurrentId();
+    renderSessionsList();
+    updateStorageHint();
+    toast('Session supprimée', 'warn');
+  });
+}
+
+// ============ REFERENCE IMAGES ============
+function compressImg(dataUrl, maxSide) {
+  return new Promise(res => {
+    const img = new Image();
+    img.onload = () => {
+      let { width: w, height: h } = img;
+      const s = Math.min(1, maxSide / Math.max(w, h));
+      w = Math.round(w * s); h = Math.round(h * s);
+      const c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      c.getContext('2d').drawImage(img, 0, 0, w, h);
+      res(c.toDataURL('image/jpeg', 0.7));
+    };
+    img.onerror = () => res(dataUrl);
+    img.src = dataUrl;
+  });
+}
+
+async function handleRefFiles(files) {
+  for (const f of files) {
+    if (!f.type.startsWith('image/')) continue;
+    const dataUrl = await new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = e => res(e.target.result);
+      r.onerror = rej;
+      r.readAsDataURL(f);
+    });
+    const big = await compressImg(dataUrl, REF_MAX_SIDE);
+    const tiny = await compressImg(dataUrl, THUMB_MAX_SIDE);
+    state.referenceImages.push(big);
+    state.referenceThumbs.push(tiny);
+  }
+  renderThumbs();
+  updateRefBadge();
+  human('📷 ' + state.referenceImages.length + ' image(s) prête(s)');
+}
+
+function renderThumbs() {
+  const el = $('thumbs');
+  el.innerHTML = state.referenceImages.map((img, i) =>
+    '<div class="thumb"><img src="' + img + '" alt="">' +
+    '<button class="rm" data-rm="' + i + '">✕</button>' +
+    '<div class="lbl">REF ' + (i + 1) + '</div></div>'
+  ).join('');
+  el.querySelectorAll('[data-rm]').forEach(b => b.onclick = (e) => {
+    e.stopPropagation();
+    const i = parseInt(b.dataset.rm, 10);
+    state.referenceImages.splice(i, 1);
+    state.referenceThumbs.splice(i, 1);
+    renderThumbs(); updateRefBadge();
+  });
+}
+
+// ============ STYLE SELECT ============
+function populateStyles() {
+  const sel = $('styleSelect');
+  sel.innerHTML = STYLES.map(s => '<option value="' + s.id + '">' + esc(s.name) + '</option>').join('');
+  sel.value = state.styleId;
+  updateStyleHint();
+  sel.addEventListener('change', () => {
+    state.styleId = sel.value;
+    updateStyleHint();
+  });
+}
+function updateStyleHint() {
+  const s = STYLES.find(x => x.id === state.styleId);
+  $('styleHint').textContent = s ? s.hint : '';
+}
+
+// ============ EXPORT / IMPORT ============
+function exportSessions() {
+  const data = { version: 4, exported: Date.now(), sessions: state.sessions };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'kata-sessions-' + new Date().toISOString().slice(0, 10) + '.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('Exporté', 'success');
+}
+function importSessions(file) {
+  const r = new FileReader();
+  r.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      const incoming = data.sessions || data;
+      if (!Array.isArray(incoming)) throw new Error('Format invalide');
+      // Merge : dédupliquer par id
+      const existing = new Set(state.sessions.map(s => s.id));
+      const added = incoming.filter(s => s.id && !existing.has(s.id));
+      state.sessions = state.sessions.concat(added);
+      saveSessions();
+      renderSessionsList();
+      updateStorageHint();
+      toast(added.length + ' session(s) importée(s)', 'success');
+    } catch (err) { toast('Import impossible : ' + err.message, 'error'); }
+  };
+  r.readAsText(file);
+}
+
+// ============ INIT / BIND ============
+function bind() {
+  populateStyles();
+
+  $('validateBtn').addEventListener('click', validateAndSaveKeys);
+  $('clearBtn').addEventListener('click', () => {
+    $('keysInput').value = '';
+    state.apiKeys = [];
+    saveKeys();
+    $('keyStatus').className = 'status-line';
+    $('keyStatusText').textContent = 'Aucune clé enregistrée';
+    updateKeyBadge();
+    toast('Clés effacées', 'warn');
+  });
+
+  $('refInput').addEventListener('change', (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length) handleRefFiles(files);
+    e.target.value = '';
+  });
+
+  $('genBtn').addEventListener('click', runGeneration);
+  $('stopBtn').addEventListener('click', stopGeneration);
+
+  $('newSessionBtn').addEventListener('click', () => {
+    state.currentSession = null;
+    saveCurrentId();
+    $('photoGrid').innerHTML = '';
+    $('resultsHeader').classList.add('hidden');
+    $('agentsView').classList.add('hidden');
+    renderSessionsList();
+    human('🆕 Nouvelle session prête');
+    toast('Nouvelle session', 'success');
+  });
+
+  $('exportBtn').addEventListener('click', exportSessions);
+  $('importInput').addEventListener('change', (e) => {
+    const f = e.target.files && e.target.files[0];
+    if (f) importSessions(f);
+    e.target.value = '';
+  });
+
+  // Console panel
+  const handle = $('panelHandle'), content = $('panelContent'), toggleText = $('panelToggle');
+  let open = false;
+  handle.addEventListener('click', (e) => {
+    if (e.target.tagName === 'BUTTON') return;
+    open = !open;
+    content.classList.toggle('hidden', !open);
+    toggleText.textContent = (open ? '▲' : '▼') + ' CONSOLE';
+  });
+  $('copyConsoleBtn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    const txt = state.debugLog.map(d => d.t + ' ' + d.m).join('\n');
+    const ta = document.createElement('textarea');
+    ta.value = txt;
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); toast('Console copiée', 'success', 1500); } catch (err) { toast('Copie impossible', 'error'); }
+    document.body.removeChild(ta);
+  });
+  $('clearConsoleBtn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    state.debugLog = [];
+    renderDebug();
+    toast('Console effacée', 'warn', 1200);
+  });
+
+  // Restauration
+  loadFromStorage();
+  if (state.apiKeys.length > 0) {
+    $('keysInput').value = state.apiKeys.join('\n');
+    $('keyStatus').className = 'status-line ok';
+    $('keyStatusText').textContent = state.apiKeys.length + ' clé(s) restaurée(s)';
+  }
+  updateKeyBadge();
+  updateRefBadge();
+  renderSessionsList();
+  updateStorageHint();
+  if (state.currentSession) {
+    const s = state.currentSession;
+    if (s.agents) { state.agents = s.agents; }
+    renderFromSession(s);
+    human('📚 Session ' + s.styleName + ' restaurée · ' + s.photos.length + ' photo(s)');
+  }
+
+  human('👋 Prêt · choisissez un style, ajoutez des images, lancez.');
+  debug('Kata Studio v4 initialisé · ' + STYLES.length + ' styles', 'ok');
+}
+
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind);
+else bind();
+</script>
+</body>
+</html>
